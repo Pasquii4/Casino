@@ -2,7 +2,7 @@ from re import I
 import os
 import sys
 import random
-import time 
+import time
 from typing import Self
 
 def borrar_preguntas():
@@ -66,85 +66,76 @@ class Casino:
             except ValueError:
                 print("\nEntrada inválida. Ingresa un número válido.\n")
 
-    def ruleta(self):
-        while True:
-            borrar_preguntas()
+#Ruleta
 
-            try:
+        def take_bets(self):
+            bets = []
+            while True:
+                bet_type = input("¿Qué quieres apostar? (número/par/impar/rojo/negro) o 'terminar' para finalizar: ").strip().lower()
+                if bet_type == 'terminar':
+                    break
+                if bet_type.isdigit():
+                    bet_type = int(bet_type)
+                amount = int(input(f"¿Cuánto quieres apostar en {bet_type}? "))
+                bets.append((bet_type, amount))
+            return bets
+    def ruleta(self):
+
+        def spin_wheel():
+            return random.randint(0, 36)
+
+        def check_bet(bet, result):
+            if bet == result:
+                return 35
+            elif (bet == 'par' and result % 2 == 0) or (bet == 'impar' and result % 2 != 0):
+                return 1
+            elif (bet == 'rojo' and result in [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]) or \
+                 (bet == 'negro' and result in [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]):
+                return 1
+            elif (bet == 'altos' and result  >= 19) or (bet == 'bajos' and result  <= 18):
+                return 1
+            elif (bet == '1docena' and result  <= 12) or (bet == '2docena' and result  > 12 and result <= 24) or (bet == '3docena' and result > 24 and result<=36):
+                return 1.5
+            return 0
+        def take_bets():
+            bets = []
+            while True:
+                bet_type = input("¿Qué quieres apostar? (número/par/impar/rojo/negro/altos/bajos/1docena/2docena/3docena) o 'terminar' para finalizar: ").strip().lower()
+                if bet_type == 'terminar':
+                    break
+                if bet_type.isdigit():
+                    bet_type = int(bet_type)
+                amount = int(input(f"¿Cuánto quieres apostar en {bet_type}? "))
+                bets.append((bet_type, amount))
+            return bets
+
+        while True:
                 borrar_preguntas()
                 print("\033[1mRuleta\033[0m \n")
                 print(f"Su saldo actual es: ${self.saldo}")
-                apuesta = float(input("Ingresa tu apuesta (o escribe 0 para salir): "))
-                if apuesta == 0:
-                    input("\nPulse Enter para salir. \n")
+                bets = take_bets()
+                if not bets:
+                    print("No has hecho ninguna apuesta. Saliendo del juego.")
                     break
-                if apuesta > self.saldo or apuesta <= 0:
-                    input("\nLa apuesta no es válida. Asegúrate de que posea ese dinero. \n")
-                    continue
-
-                print("Opciones de apuesta:")
-                print("1. Número específico (0-36)")
-                print("2. Color (Rojo/Negro)")
-                print("3. Par o impar")
-                tipo_apuesta = input("Elige el tipo de apuesta: ").strip()
-
-                if tipo_apuesta == "1":
-                    numero = input("Elige un número (0-36): ").strip()
-                    if not numero.isdigit() or not (0 <= int(numero) <= 36):
-                        input("\nNúmero no válido. Debes elegir un número entre 0 y 36.\n")
-                        continue
-                    resultado = random.randint(0, 36)
-                    borrar_preguntas()
-                    print(f"Su apuesta es ${apuesta} a {numero}")
-                    print(f"\nLa ruleta cayó en el número {resultado}.\n")
-                    if int(numero) == resultado:
-                        self.saldo += apuesta * 35  # Paga 35:1
-                        input(f"\033[1m\n¡Ganaste! \n\033[0mTu nuevo saldo es: ${self.saldo:.2f}\033[0m\n")
+                print("Girando la ruleta...")
+                result = spin_wheel()
+                print(f"El resultado es: {result}")
+                winnings = 0
+                for bet, amount in bets:
+                    multiplier = check_bet(bet, result)
+                    if multiplier > 0:
+                        winnings += amount * multiplier
+                        print(f"Ganaste {amount * multiplier} en la apuesta {bet}!")
                     else:
-                        self.saldo -= apuesta
-                        input(f"\033[1m\nPerdiste...\n\033[0mTu nuevo saldo es: ${self.saldo:.2f}\n")
-
-                elif tipo_apuesta == "2":
-                    color = input("Elige un color (rojo/negro): ").strip().lower()
-                    if color not in ["rojo", "negro"]:
-                        input("\nColor no válido. Debes elegir 'rojo' o 'negro'.\n")
-                        continue
-                    resultado = random.choice(["rojo", "negro"])
-                    borrar_preguntas()
-                    print(f"Su apuesta es ${apuesta} a {color}")
-                    print(f"\nLa ruleta cayó en el color {resultado}.\n")
-                    if color == resultado:
-                        self.saldo += apuesta
-                        input(f"\033[1m\n¡Ganaste!\n\033[0mTu nuevo saldo es: ${self.saldo:.2f}\033[0m\n")
-                    else:
-                        self.saldo -= apuesta
-                        input(f"\033[1m\nPerdiste... \n\033[0mTu nuevo saldo es: ${self.saldo:.2f}\033[0m\n")
-
-                elif tipo_apuesta == "3":
-                    paridad = input("Elige par o impar: ").strip().lower()
-                    if paridad not in ["par", "impar"]:
-                        input("\nOpción no válida. Debes elegir 'par' o 'impar'.\n")
-                        continue
-                    resultado = random.randint(0, 36)
-                    borrar_preguntas()
-                    print(f"Su apuesta es ${apuesta} a {paridad}")
-                    print(f"\nLa ruleta cayó en el número {resultado}.\n")
-                    if (resultado % 2 == 0 and paridad == "par") or (resultado % 2 != 0 and paridad == "impar"):
-                        self.saldo += apuesta
-                        input(f"\033[1m\n¡Ganaste!\n\033[0mTu nuevo saldo es: ${self.saldo:.2f}\033[0m\n")
-                    else:
-                        self.saldo -= apuesta
-                        input(f"\033[1m\nPerdiste... \n\033[0mTu nuevo saldo es: ${self.saldo:.2f}\033[0m\n")
-
-                else:
-                    input("\nTipo de apuesta no válido. Inténtalo de nuevo.\n")
-
+                        print(f"Perdiste {amount} en la apuesta {bet}.")
+                self.saldo += winnings - sum(amount for _, amount in bets)
                 if self.saldo <= 0:
-                    input("\n\033[1mSaldo insuficiente. Saliendo de Ruleta...\033[0m\n")
-                    break
-
-            except ValueError:
-                input("\nEntrada inválida. Ingresa un número válido.\n")
+                    print("Te has quedado sin saldo. ¡Hasta luego!")
+                else:
+                    play_again = input("¿Quieres jugar de nuevo? (s/n): ").strip().lower()
+                    if play_again != 's':
+                        print(f"Gracias por jugar. Tu saldo final es: ${self.saldo}")
+                        break
 
 #BlackJack
 
@@ -242,10 +233,11 @@ class Casino:
                         print("\nPierdes.")
                         self.saldo -= apuesta
                         input(f"Su nuevo saldo es ${self.saldo}")
-                    
+
 
                     if self.saldo <= 0:
-                        input("\n\033[1mSaldo insuficiente. Saliendo de Blackjack...\033[0m\n")
+                        print("\n\033[1mSaldo insuficiente. Saliendo de Blackjack...\033[0m\n")
+                        time.sleep(1)
                         break
                  except ValueError:
                     print("\nEntrada inválida. Por favor, ingresa un número válido.")
@@ -260,26 +252,26 @@ class Casino:
 
     def girar_rodillos(self):
         simbolos = ["🍒", "🔔", "🍋", "🍉", "⭐", "💎", "7"]
-        return [random.choice(simbolos) for _ in range(3)]  
+        return [random.choice(simbolos) for _ in range(3)]
 
     def obtener_multiplicador(self, simbolo):
         multiplicadores = {
-            "🍒": 10,    
-            "🔔": 10,   
-            "🍋": 10,  
-            "🍉": 10,    
-            "⭐": 20,   
+            "🍒": 10,
+            "🔔": 10,
+            "🍋": 10,
+            "🍉": 10,
+            "⭐": 20,
             "7" : 25,
-            "💎": 30   
+            "💎": 30
         }
         return multiplicadores.get(simbolo, 1)
 
     # Función para calcular el resultado
     def calcular_resultado(self, slot):
-        self.saldo -= self.apuesta 
+        self.saldo -= self.apuesta
         if slot[0] == slot[1] == slot[2]:
             multiplicador = self.obtener_multiplicador(slot[0])
-            self.saldo += self.apuesta * multiplicador 
+            self.saldo += self.apuesta * multiplicador
             if  slot[0] == slot[1]:
                 return f"🎉 ¡Ganaste! {slot[0]} x{multiplicador} \nTu saldo ahora es: ${self.saldo}"
             elif slot[1] == slot[2]:
@@ -330,7 +322,8 @@ class Casino:
 
             # Verificar si queda saldo
             if self.saldo <= 0:
-                input("😢 Te has quedado sin saldo. ¡Gracias por jugar!")
+                print("\n\033[1mSaldo insuficiente. Saliendo de las Slots...\033[0m\n")
+                time.sleep(1)
                 break
 
     def mostrar_caballos(self):
@@ -372,7 +365,7 @@ class Casino:
                 self.mover_caballo(caballo[0], posiciones[caballo[0]])
             time.sleep(0.1)
             print("\n" * 20)
-        
+
         ganador = max(posiciones, key=posiciones.get)
         return ganador
 
@@ -384,9 +377,9 @@ class Casino:
             print("¡Bienvenidos a la carrera de caballos del Casino! 🏇")
             self.mostrar_caballos()
             self.mostrar_saldo()
-        
+
         # Selección del caballo y cantidad de la apuesta
-        
+
             try:
                 apuesta_num = float(str(input("¿A cuál caballo quieres apostar (Escribe '0' para salir)?: ")))
                 if apuesta_num == 0:
@@ -418,7 +411,7 @@ class Casino:
                 print("¡Goo!")
                 time.sleep(0.5)
 
-                # Ejecución de la carrera
+                # Ejecutar la carrera
                 ganador = self.correr_carrera()
 
                 print(f"¡El ganador es {ganador}!")
@@ -539,19 +532,17 @@ class Casino:
                     self.sacar_numero()
                     self.mostrar_cartones()
 
-                    # Verificar líneas
                     for carton in self.cartones:
                         if not self.linea_hecha and self.verificar_linea(carton):
                             self.linea_hecha = True
                             recompensa_linea = 50
                             self.saldo += recompensa_linea
                             print(f"¡Línea! Has ganado {recompensa_linea} euros.")
-                    
+
                     if not self.linea_hecha and self.verificar_linea(self.crupier_carton):
                         self.linea_hecha = True
                         print("El crupier ha hecho una línea.")
-                    
-                    # Verificar bingo
+
                     for carton in self.cartones:
                         if self.verificar_bingo(carton):
                             recompensa_bingo = 100
@@ -573,6 +564,7 @@ class Casino:
                 break
             else:
                 print("Opción no válida. Inténtalo de nuevo.")
+
     def ATM(self):
         try:
             borrar_preguntas()
@@ -584,7 +576,6 @@ class Casino:
             input("Pulse Enter para volver al menú")
         except ValueError:
             input("Pulse Enter para volver al menu")
-        
 
 
     def iniciar(self):
@@ -593,7 +584,7 @@ class Casino:
             print("\033[1mBienvenido al casino\033[0m\n")
             print("¡Seleccione la modalidad!\n")
             print("1. Coin flip")
-            print("2. Ruleta")
+            print("2. La Mil Colores(Ruleta)")
             print("3. Blacjack")
             print("4. ArruinaSueldos(Slots)")
             print("5. Carrera De caballos")
