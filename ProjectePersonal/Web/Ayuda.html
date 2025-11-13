@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/ProjectePersonal/Styles/styles.css">
+    <title>Casino</title>
+</head>
+<body>
+    <header>
+        <h1>Proyecto Casino: Casino</h1>
+        <nav>
+            <ul>
+                <li><a href="/ProjectePersonal/Project.html" class="button">Inici</a></li>
+                <li><a href="CoinFlip.html" class="button">CoinFlip</a></li>
+                <li><a href="Ruleta.html" class="button">Ruleta</a></li>
+                <li><a href="BlackJack.html" class="button">BlackJack</a></li>
+                <li><a href="slots.html" class="button">Slots</a></li>
+                <li><a href="CarreraCaballos.html" class="button">Carreras de caballos</a></li>
+                <li><a href="Bingo.html" class="button">Bingo</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="Casino">
+            <h2>Manual</h2>
+            <p>Para utilizar el casino solo debes copiar el Codigo deseado y pegarlo en una pagina de Visual Studio o similar.</p>
+            <button id="guiaButton" class="button">Guia De Uso</button>
+            <video id="guiaVideo" width="600" controls style="display:none;">
+                <source src="/ProjectePersonal/Guia/Guia.mp4"type="video/mp4">
+                Tu navegador no soporta la etiqueta de video.
+            </video>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Proyecto Personal de Casino</p>
+    </footer>
+
+    <script>
+        document.getElementById('guiaButton').addEventListener('click', function() {
+            var video = document.getElementById('guiaVideo');
+            video.style.display = 'block';
+            video.play();
+        });
+    </script>
+</body>
+</html>
